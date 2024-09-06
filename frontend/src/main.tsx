@@ -7,6 +7,7 @@ import Home from './pages/Home.tsx';
 import Admin from './pages/Admin.tsx';
 import LoginHotel from './pages/LoginHotel.tsx';
 import RegisterHotel from './pages/RegisterHotel.tsx';
+import Booking from './pages/Booking.js';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterHotel/>
+  },
+  {
+    path: "/booking",
+    element: <Booking/>
   }
 ])
 

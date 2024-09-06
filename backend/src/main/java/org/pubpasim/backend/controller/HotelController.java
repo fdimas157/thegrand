@@ -33,7 +33,7 @@ public class HotelController {
         return hotelRepository.findAll();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("byid/{id}")
     public Optional<Hotel> getHotelById(@PathVariable Long id) {
         return hotelRepository.findById(id);
     }

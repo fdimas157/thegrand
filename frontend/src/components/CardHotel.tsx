@@ -1,8 +1,11 @@
 import { IoLocationSharp, IoStar } from "react-icons/io5";
 import { Hotel } from "../pages/Search";
+import { useNavigate } from "react-router-dom";
 
 export default function CardHotel({ hotel }: { hotel: Hotel }) {
   const priceBefore = hotel.price * 1.25;
+  const navigate = useNavigate();
+
 
   const renderStars = () => (
     [...Array(5)].map((_, i) => (
@@ -43,7 +46,12 @@ export default function CardHotel({ hotel }: { hotel: Hotel }) {
         <div className="line-through text-gray-400 text-sm">Rp. {priceBefore.toLocaleString('id-ID')}</div>
         <div className="text-3xl text-orange-500">Rp. {hotel.price.toLocaleString('id-ID')}</div>
         <div className="font-outfit text-xs pb-4">Sudah termasuk pajak & biaya</div>
-        <button className="bg-orange-500 hover:bg-orange-600 h-10 w-7/12 rounded-xl text-xs text-white">Booking Sekarang</button>
+        <button
+          onClick={() => {
+            localStorage.setItem('hotel', JSON.stringify(hotel.id));
+            navigate("/booking");
+          }}
+          className="bg-orange-500 hover:bg-orange-600 h-10 w-7/12 rounded-xl text-xs text-white">Booking Sekarang</button>
       </div>
     </div>
   );
