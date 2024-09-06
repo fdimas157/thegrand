@@ -35,6 +35,11 @@ public class UserController {
         return userRepository.findById(id);
     }
 
+    @GetMapping("byemail/{email}")
+    public Optional<User> getUserByEmail(@PathVariable String email) {
+        return userRepository.findByEmail(email);
+    }
+
     @PostMapping
     public User addNewRoom(@RequestBody User user) {
         return userRepository.save(user);

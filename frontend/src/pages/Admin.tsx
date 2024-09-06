@@ -1,4 +1,4 @@
-import { BedDouble, CircleDollarSign, House, UsersRound, Search, SquarePlus, BookX, CircleX } from "lucide-react";
+import { BedDouble, CircleDollarSign, House, UsersRound, Search, SquarePlus, CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface Hotel{
@@ -40,21 +40,15 @@ export default function Admin(){
     const [booking, setBooking] = useState<boolean>(false)
     const [cancel, setCancel] = useState<boolean>(false);
     const [popUpAdd, setPopUpAdd] = useState<boolean>(false)
-
     const [dataHotel, setDataHotel] = useState<Hotel[]>([]);
     const [dataVisitor, setDataVisitor] = useState<Visitor[]>([]);
     const [dataBooking, setDataBooking] = useState<Booking[]>([]);
-
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage: number = 5;
-
     const indexOfLastItem: number = currentPage * itemsPerPage;
     const indexOfFirstItem: number = indexOfLastItem - itemsPerPage;
     const currentItems: Hotel[] = dataHotel.slice(indexOfFirstItem, indexOfLastItem);
-
     const paginate = (pageNumber: number): void => setCurrentPage(pageNumber);
-
-
     const [newHotel, setNewHotel] = useState<Partial<Hotel>>({
         name: "",
         type: "",
@@ -83,8 +77,6 @@ export default function Admin(){
             .then((response) => response.json())
             .then((data) => setDataBooking(data));
     }, [])
-
-    console.log(newHotel.city);
     
 
     return <div className="flex flex-row">
@@ -139,18 +131,7 @@ export default function Admin(){
                 className=" bg-white w-full text-blue-600 font-rowdies text-sm rounded h-12 cursor-pointer flex items-center p-2 gap-2 border-4 border-white hover:border-yellow-400">
                 <CircleDollarSign />
                 Booking
-            </div>        
-            <div onClick={() => {
-                    setCancel(true)
-                    setBooking(false);
-                    setVisitor(false);
-                    setHotel(false);
-                    setDashboard(false);
-                }}   
-                className=" bg-white w-full text-blue-600 font-rowdies text-sm rounded h-12 cursor-pointer flex items-center p-2 gap-2 border-4 border-white hover:border-yellow-400">
-                <BookX />
-                Cancelled
-            </div>
+            </div>     
         </div>
         <div className="w-4/5 h-screen">
             {popUpAdd && (
@@ -166,7 +147,6 @@ export default function Admin(){
                         <form 
                             action="" 
                             className="flex flex-row gap-2 w-full">
-                            
                             <div className="flex flex-col gap-2 w-1/2 px-2">
                                 <label htmlFor="" className="flex flex-col gap-2 font-rowdies text-sm">
                                     Nama
@@ -459,7 +439,20 @@ export default function Admin(){
                                     <td className="border-2 border-black">{guest.password}</td>
                                     <td className="border-2 border-black">{guest.phone}</td>
                                     <td className="border-2 border-black p-2">
-                                        <button className="p-2 bg-red-600 text-white rounded font-rowdies">Hapus</button>
+                                        <button 
+                                            onClick={() => {
+                                                fetch(`http://localhost:8084/api/customer/${guest.id}`,{
+                                                    method: "DELETE"
+                                                }).then((response) => {
+                                                    if(response.ok){
+                                                        setDataVisitor(dataVisitor.filter((v) => v.id !== guest.id))
+                                                    }
+                                                })
+                                            }}  
+                                            className="p-2 bg-red-600 text-white rounded font-rowdies"
+                                        >
+                                            Hapus
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -502,7 +495,17 @@ export default function Admin(){
                                     <td className="border-2 border-black">{book.numberOfGuest}</td>
                                     <td className="border-2 border-black">{book.totalPrice}</td>
                                     <td className="border-2 border-black p-2">
-                                        <button className="p-2 bg-red-600 text-white rounded font-rowdies">Hapus</button>
+                                        <button
+                                            onClick={() => {
+                                                fetch(`http://localhost:8084/api/hotel/${book.id}`,{
+                                                    method: "DELETE"
+                                                }).then((response) => {
+                                                    if(response.ok){
+                                                        setDataBooking(dataBooking.filter((b) => b.id !== book.id))
+                                                    }
+                                                })
+                                            }}  
+                                            className="p-2 bg-red-600 text-white rounded font-rowdies">Hapus</button>
                                     </td>
                                 </tr>
                             ))}
