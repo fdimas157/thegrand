@@ -12,12 +12,12 @@ export default function HeaderSearch(){
             <div className="flex items-center flex-row gap-4">
                 <div className="text-white font-rowdies text-xs flex gap-2 flex-row items-center">
                     <div>Chek-In : </div>
-                    <div className="">1/08/2024</div>
+                    <div className="">7/09/2024</div>
                     <CalendarCog size={16} className="cursor-pointer"/>
                 </div>
                 <div className="text-white font-rowdies text-xs flex gap-2 flex-row items-center">
                     <div>Chek-out : </div>
-                    <div className="">3/08/2024</div>
+                    <div className="">8/09/2024</div>
                     <CalendarCog size={16} className="cursor-pointer"/>
                 </div>
                 <div className="font-rowdies text-xs text-white">Untuk 2 Tamu</div>

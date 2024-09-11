@@ -17,7 +17,7 @@ public class Booking {
     private Customer customerId;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", referencedColumnName = "id")
+    @JoinColumn(name = "hotel_id", referencedColumnName = "id")
     private Hotel hotelId;
 
     private String checkIn;

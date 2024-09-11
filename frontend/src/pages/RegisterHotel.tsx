@@ -4,7 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 export interface Visitor{
     id: number,
-    name?: string,
+    firstName?: string,
+    lastName?: string,
     age: number,
     address: string,
     email: string,
@@ -12,32 +13,18 @@ export interface Visitor{
     phone: string
 }
 
-export interface User{
-    id: number,
-    email: string,
-    password: string,
-    name: string,
-    role: string
-}
-
 export default function RegisterHotel(){
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const [newVisitor, setNewVisitor] = useState<Partial<Visitor>>({
-        name: "",
+        firstName: "",
+        lastName: "",
         age: 0,
         address: "",
         email: "",
         password: "",
         phone: ""
-    })
-
-    const [user, setUser] = useState<Partial<User>>({
-        email: "",
-        password: "",
-        name: "",
-        role: "user"
     })
 
     const togglePasswordVisibility = () => {
@@ -53,17 +40,28 @@ export default function RegisterHotel(){
                 </div>
                 <form action="" className="flex w-full items-center font-outfit flex-row">
                     <div className=" flex flex-col w-full gap-2">
-                        <label htmlFor="" className="flex flex-col w-full items-center px-2">
-                            <div className="text-left w-full font-bold">Nama Lengkap</div>
-                            <input 
-                                type="email"
-                                required
-                                onChange={(e)=> {
-                                    setNewVisitor({...newVisitor, name: e.target.value});
-                                    setUser({...user, name: e.target.value})
-                                }}
-                                className="border-2 border-black h-10 w-full rounded-lg text-sm px-2" />
-                        </label>
+                        <div className="flex flex-row">
+                            <label htmlFor="" className="flex flex-col w-full items-center px-2">
+                                <div className="text-left w-full font-bold">Nama Depan</div>
+                                <input 
+                                    type="text"
+                                    required
+                                    onChange={(e)=> {
+                                        setNewVisitor({...newVisitor, firstName: e.target.value});
+                                    }}
+                                    className="border-2 border-black h-10 w-full rounded-lg text-sm px-2" />
+                            </label>
+                            <label htmlFor="" className="flex flex-col w-full items-center px-2">
+                                <div className="text-left w-full font-bold">Nama Belakang</div>
+                                <input 
+                                    type="text"
+                                    required
+                                    onChange={(e)=> {
+                                        setNewVisitor({...newVisitor, lastName: e.target.value});
+                                    }}
+                                    className="border-2 border-black h-10 w-full rounded-lg text-sm px-2" />
+                            </label>
+                        </div>
                         <div className="flex flex-row">
                             <label htmlFor="" className="flex flex-col w-full items-center px-2">
                                 <div className="text-left w-full font-bold">Usia</div>
@@ -98,7 +96,6 @@ export default function RegisterHotel(){
                                 required
                                 onChange={(e)=> {
                                     setNewVisitor({...newVisitor, email: e.target.value})
-                                    setUser({...user, email: e.target.value})
                                 }}
                                 className="border-2 border-black h-10 w-full rounded-lg px-2 text-sm" />
                         </label>
@@ -111,7 +108,6 @@ export default function RegisterHotel(){
                                 required
                                 onChange={(e)=> {
                                     setNewVisitor({...newVisitor, password: e.target.value})
-                                    setUser({...user, password: e.target.value})
                                 }}
                                 className="border-2 border-black h-10 w-full rounded-lg px-2 text-sm"
                                 />
@@ -127,46 +123,36 @@ export default function RegisterHotel(){
                         <div className="p-2 flex justify-center items-center gap-4">
                             <Link to={"/login"} className="bg-blue-600 text-white w-2/5 h-10 rounded-lg font-bold cursor-pointer hover:bg-blue-700 flex justify-center items-center">Login</Link>
                             <button 
-                                onClick={() => {
-                                    fetch("http://localhost:8084/api/customer", {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify(newVisitor),
-                                    })
-                                    .then((response) => response.json())
-                                    .then(() => {
-                                        navigate("/")
+                                onClick={async (e) => {
+                                    e.preventDefault();
+                                    try {
+                                        const customerResponse = await fetch("http://localhost:8084/api/customer", {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify(newVisitor),
+                                        });
+                                        if (!customerResponse.ok) {
+                                            throw new Error(`Error: ${customerResponse.status} ${customerResponse.statusText}`);
+                                        }
+                                        const customerResult = await customerResponse.json();
+                                        console.log("Customer created successfully:", customerResult);
                                         setNewVisitor({
-                                            name: "",
+                                            firstName: "",
+                                            lastName: "",
                                             age: 0,
                                             address: "",
                                             email: "",
                                             password: "",
-                                            phone: ""
-                                        }
-                                    )});
-                                    fetch("http://localhost:8084/api/user", {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify(user),
-                                    })
-                                    .then((response) => response.json())
-                                    .then(() => {
+                                            phone: "",
+                                        });
                                         localStorage.setItem('user', newVisitor.email || "");
-                                        navigate("/")
-                                        setNewVisitor({
-                                            name: "",
-                                            age: 0,
-                                            address: "",
-                                            email: "",
-                                            password: "",
-                                            phone: ""
-                                        }
-                                    )});
+                                        navigate("/");
+                                    } catch (error) {
+                                        console.error("Error occurred:", error);
+                                        alert("Failed to submit data. Please try again later.");
+                                    }
                                 }}
                                 className="bg-orange-500 text-white w-2/5 h-10 rounded-lg font-bold cursor-pointer hover:bg-orange-600"
                             >
