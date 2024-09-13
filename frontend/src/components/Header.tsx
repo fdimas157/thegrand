@@ -14,7 +14,7 @@ export interface User {
   phone?: string;
 }
 
-export default function Header({ setCity }: { setCity: React.Dispatch<React.SetStateAction<string>> }) {
+export default function Header() {
   const [user, setUser] = useState<Partial<User>>({});
   const [popUpProfile, setPopUpProfile] = useState<boolean>(false);
 
@@ -35,8 +35,6 @@ export default function Header({ setCity }: { setCity: React.Dispatch<React.SetS
     }
   }, []);
 
-  const cities = ["Jakarta", "Bandung", "Yogyakarta", "Surabaya", "Medan"];
-
   return (
     <header>
       <div className="flex flex-row justify-around p-4">
@@ -46,18 +44,7 @@ export default function Header({ setCity }: { setCity: React.Dispatch<React.SetS
           </h1>
         </Link>
         <div className="flex gap-4 justify-center items-center">
-          <select
-            name="city"
-            id="city"
-            className="font-bold p-2 w-32 focus:outline-none"
-            onChange={(e) => setCity(e.target.value)}
-          >
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
+          
           {user?.firstName ? (
             <div className="flex items-center gap-4">
               <div className="font-rowdies">Selamat Datang {user.firstName || "Pengguna"}</div>

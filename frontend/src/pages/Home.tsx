@@ -9,6 +9,7 @@ export default function Home() {
   const [city, setCity] = useState<string>("Jakarta");
   const hotelDipslay = [
     {
+      id: 1,
       city: "Jakarta",
       pic: "/src/assets/hotel/hotel1.png",
       name: "El Jakarta Hotel",
@@ -17,6 +18,7 @@ export default function Home() {
       priceAfter: "Rp. 234.599"
     },
     {
+      id: 2,
       city: "Bandung",
       pic: "/src/assets/hotel/hotel2.png",
       name: "Grand Solvakia",
@@ -25,6 +27,7 @@ export default function Home() {
       priceAfter: "Rp. 524.999"
     },
     {
+      id: 3,
       city: "Surabaya",
       pic: "/src/assets/hotel/hotel3.png",
       name: "Surya Yudha Hotel",
@@ -33,6 +36,7 @@ export default function Home() {
       priceAfter: "Rp. 174.599"
     },
     {
+      id: 4,
       city: "Medan",
       pic: "/src/assets/hotel/hotel4.png",
       name: "Grand Kanaya",
@@ -41,6 +45,7 @@ export default function Home() {
       priceAfter: "Rp. 209.599"
     },
     {
+      id: 5,
       city: "Jakarta",
       pic: "/src/assets/hotel/hotel1.png",
       name: "OYO Persimpangan",
@@ -49,6 +54,7 @@ export default function Home() {
       priceAfter: "Rp. 94.599"
     },
     {
+      id: 6,
       city: "Yogyakarta",
       pic: "/src/assets/hotel/hotel6.png",
       name: "OYO Jl. Malioboro",
@@ -60,7 +66,7 @@ export default function Home() {
 
   return (
     <>
-      <Header city={city} setCity={setCity}/>
+      <Header />
       <div className="flex flex-col justify-center items-center">
         <div className="flex flex-col">
           <img src="/src/assets/room/room2.jpg" alt="" />
@@ -76,35 +82,41 @@ export default function Home() {
         <div className="w-3/4 h-28 bg-white rounded-xl flex justify-center items-center absolute bottom-0 shadow-xl">
           <form
             action=""
-            className="flex justify-center items-center font-noto text-center w-11/12"
+            className="flex justify-center items-center font-noto text-center"
           >
-            <table>
+            <table >
               <tr className="font-bold text-sm"> 
+                <td>Kota</td>
                 <td>Tanggal Check-In</td>
                 <td>Tanggal Check-Out</td>
                 <td>Jumlah Tamu</td>
-                <td>Jumlah Kamar</td>
               </tr>
-              <tr>
-                <td className="border border-black">
+              <tr className="font-outfit">
+                <td className="border border-black w-1/4">
+                  <select 
+                    onChange={(e)=> setCity(e.target.value)}
+                    className="w-full px-2 focus:outline-none"
+                  >
+                    <option value="Jakarta">Jakarta</option>
+                    <option value="Surabaya">Surabaya</option>
+                    <option value="Bandung">Bandung</option>
+                    <option value="Yogyakarta">Yogyakarta</option>
+                    <option value="Medan">Medan</option>
+                  </select>
+                </td>
+                <td className="border border-black w-1/4">
                   <input
                     type="date"
                     className="w-full h-8 border-none focus:outline-none px-2"
                   />
                 </td>
-                <td className="border border-black">
+                <td className="border border-black w-1/4">
                   <input
                     type="date"
                     className="w-full h-8 border-none focus:outline-none px-2"
                   />
                 </td>
-                <td className="border border-black">
-                  <input
-                    type="number"
-                    className="w-full h-8 border-none focus:outline-none px-2"
-                  />
-                </td>
-                <td className="border border-black">
+                <td className="border border-black w-1/4">
                   <input
                     type="number"
                     className="w-full h-8 border-none focus:outline-none px-2"
