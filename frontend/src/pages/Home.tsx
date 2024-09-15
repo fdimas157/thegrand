@@ -178,7 +178,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap flex-row gap-4 p-4 justify-center">
             {hotelDipslay.map((hotel) => (
-              <div className="w-44 h-72 rounded-xl shadow-xl p-2 flex flex-col items-center">
+              <div key={hotel.id} className="w-44 h-72 rounded-xl shadow-xl p-2 flex flex-col items-center">
                 <div className="font-rowdies text-xl">{hotel.city}</div>
                 <img src={hotel.pic} alt="" className="pt-2 rounded w-full"/>
                 <div className="font-rowdies pt-2 text-center">{hotel.name}</div>

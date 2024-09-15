@@ -1,4 +1,4 @@
-import { AirVent, ChevronDown, SquareParking, UtensilsCrossed, Waves, Wifi } from "lucide-react";
+import { AirVent, AlarmClock, ChevronDown, SquareParking, UtensilsCrossed, Waves, Wifi, } from "lucide-react";
 import HeaderSearch from "../components/HeaderSearch";
 import { IoStar, IoStarHalf } from "react-icons/io5";
 import { TbDisabled, TbHours24 } from "react-icons/tb";
@@ -24,15 +24,74 @@ export interface Hotel{
   roomAvailable: number
 }
 
+export interface Visitor{
+  id: number,
+  firstName?: string,
+  lastName?: string,
+  age: number,
+  address: string,
+  email: string,
+  password: string,
+  phone: string
+}
+
+export interface Booking{
+  id?: number,
+  checkIn: string,
+  checkOut: string,
+  numberOfGuest: number,
+  totalPrice: number,
+  customerId: {
+    id:number
+  },
+  hotelId: {
+    id:number
+  },
+}
+
 export default function Booking() {
   const [hotel, setHotel] = useState<Hotel>()
-  const tax = Math.ceil(hotel?.price * 0.05 + 150000);
+  const [visitor, setVisitor] = useState<Visitor>({})
+  const priceHotel = Number(localStorage.getItem("priceHotel"))
+  const tax = Math.ceil(priceHotel * 0.05 + 150000);
+  const totalPrice = Math.ceil(priceHotel + tax);
+  const storedData = localStorage.getItem("searchHotel") || "{}";
+  const { checkIn, checkOut, numberOfGuest } = JSON.parse(storedData);
+  const [booking, setBooking] = useState<Booking>({
+    checkIn: checkIn,
+    checkOut: checkOut,
+    numberOfGuest: numberOfGuest,
+    totalPrice: totalPrice,
+    customerId: {
+      id: Number(localStorage.getItem("customerId")),
+    },
+    hotelId: {
+      id: Number(localStorage.getItem("hotelId")),
+    }
+  })
+  console.log(booking);
+  
 
   useEffect(() => {
     fetch(`http://localhost:8084/api/hotel/byid/${localStorage.getItem('hotel')}`)
         .then((response) => response.json())
-        .then((data) => setHotel(data));
-}, [])
+        .then((data) => {
+          setHotel(data)
+          localStorage.setItem("hotelId", data.id.toString());
+          localStorage.setItem("priceHotel", data.price.toString());
+        });
+  }, [])
+
+  useEffect(() => {
+    fetch(`http://localhost:8084/api/customer/byemail/${localStorage.getItem('user')}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setVisitor(data)
+          localStorage.setItem("customerId", data.id.toString());
+        });
+  }, [])
+
+
 
 
   return (
@@ -164,25 +223,25 @@ export default function Booking() {
             <div className="w-2/3 bg-white rounded-xl flex flex-col pb-4">
               <p className="text-2xl font-outfit font-bold p-4">Data Pemesanan (Booking)</p>
               <div className="flex flex-col font-outfit gap-2">
-                <div className="px-2 flex gap-2 flex-row">
+                <div className="px-2 flex gap-2 flex-row font-bold">
                   <label htmlFor="" className="flex flex-col w-full px-2 "> Nama Depan
-                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm"/>
+                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm" value={visitor.firstName} disabled/>
                   </label>
                   <label htmlFor="" className="flex flex-col w-full px-2 "> Nama Belakang
-                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm"/>
+                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm" value={visitor.lastName} disabled/>
                   </label>
                 </div>
-                <div className="px-2 flex gap-2 flex-row">
-                  <label htmlFor="" className="flex flex-col w-full px-2 "> Usia
-                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm"/>
+                <div className="px-2 flex gap-2 flex-row font-bold">
+                  <label htmlFor="" className="flex flex-col w-full px-2 " > Usia
+                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm" value={visitor.age} disabled/>
                   </label>
                   <label htmlFor="" className="flex flex-col w-full px-2 "> No. Handphone
-                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm"/>
+                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm" value={visitor.phone} disabled/>
                   </label>
                 </div>
-                <div className="px-2">
+                <div className="px-2 font-bold">
                   <label htmlFor="" className="flex flex-col w-full px-2 "> Alamat
-                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm"/>
+                    <input type="text" className="h-10 border-2 border-black rounded-lg px-2 text-sm" value={visitor.address} disabled/>
                   </label>
                 </div>
                 <div className="px-2 p-2">
@@ -200,7 +259,7 @@ export default function Booking() {
                   <p>Harga Kamar</p>
                   <p>Rp. {hotel?.price.toLocaleString('id-ID')}</p>
                 </div>
-                <p className="text-xs text-gray-500">(1x) 1 Queen Standard Smoking Terrace Access (1 malam)</p>
+                <p className="text-xs text-gray-500">{hotel?.city}: {hotel?.name} ({numberOfGuest} orang)</p>
                 <div className="flex flex-row justify-between text-lg pt-8">
                   <p>Pajak dan Biaya</p>
                   <p>Rp. {tax.toLocaleString('id-ID')}</p>
@@ -208,7 +267,32 @@ export default function Booking() {
                 <hr className="mt-2"/>
                 <div className="flex flex-row justify-between text-lg pt-2 font-bold">
                   <p>Pajak dan Biaya</p>
-                  <p>Rp. {(hotel?.price + tax).toLocaleString('id-ID')}</p>
+                  <p>Rp. {totalPrice.toLocaleString('id-ID')}</p>
+                </div>
+                <div className="flex justify-center pt-4 flex-col items-center gap-2">
+                  <p className="text-xs text-blue-600 font-bold flex flex-row gap-2 items-center"><AlarmClock size={16}/>Pesan sekarang sebelum harga berubah!</p>
+                  <button onClick={async (e) => {
+                    e.preventDefault();
+                    try {
+                        const customerResponse = await fetch("http://localhost:8084/api/booking/add", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(booking),
+                        });
+                        if (!customerResponse.ok) {
+                            throw new Error(`Error: ${customerResponse.status} ${customerResponse.statusText}`);
+                        }
+                        const customerResult = await customerResponse.json();
+                        console.log("Customer created successfully:", customerResult);
+                        alert("Booking success");
+                    } catch (error) {
+                        console.error("Error occurred:", error);
+                        alert("Failed to submit data. Please try again later.");
+                    }
+                }}
+                    className="bg-orange-500 w-40 text-sm font-outfit font-bold h-10 rounded-lg text-white">Booking Sekarang</button>
                 </div>
               </div>
             </div>

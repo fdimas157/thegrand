@@ -37,8 +37,9 @@ public class BookingController {
         return bookingRepositoy.findById(id);
     }
 
-    @PostMapping
+    @PostMapping("add")
     public Booking addNewBooking(@RequestBody Booking booking) {
+        System.out.println(booking);
         return bookingRepositoy.save(booking);
     }
 
