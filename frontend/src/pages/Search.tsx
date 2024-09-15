@@ -30,6 +30,7 @@ export default function Search(){
             .then((data) => setHotel(data));
     }, [])
 
+    
     return (
         <>
             <HeaderSearch/>

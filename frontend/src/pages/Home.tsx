@@ -2,10 +2,22 @@ import { useState } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { Search } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
+export interface SearchHotel {
+  city: string;
+  checkIn: string;
+  checkOut: string;
+  numberOfGuest: number;
+}
 
 export default function Home() {
+  const [SearchHotel, setSearchHotel] = useState<SearchHotel>({
+    city: "",
+    checkIn: "",
+    checkOut: "",
+    numberOfGuest: 0
+  })
   const [city, setCity] = useState<string>("Jakarta");
   const hotelDipslay = [
     {
@@ -63,6 +75,7 @@ export default function Home() {
       priceAfter: "Rp. 104.999"
     },
   ]
+  const navigate = useNavigate();
 
   return (
     <>
@@ -94,7 +107,12 @@ export default function Home() {
               <tr className="font-outfit">
                 <td className="border border-black w-1/4">
                   <select 
-                    onChange={(e)=> setCity(e.target.value)}
+                    value={city} 
+                    onChange={(e)=> {
+                      setCity(e.target.value);
+                      setSearchHotel({...SearchHotel, city: e.target.value})
+                      localStorage.setItem("city", e.target.value)
+                    }}
                     className="w-full px-2 focus:outline-none"
                   >
                     <option value="Jakarta">Jakarta</option>
@@ -107,23 +125,37 @@ export default function Home() {
                 <td className="border border-black w-1/4">
                   <input
                     type="date"
+                    required
+                    onChange={(e) => setSearchHotel({...SearchHotel, checkIn: e.target.value})}
                     className="w-full h-8 border-none focus:outline-none px-2"
                   />
                 </td>
                 <td className="border border-black w-1/4">
                   <input
                     type="date"
+                    required
+                    onChange={(e) => setSearchHotel({...SearchHotel, checkOut: e.target.value})}
                     className="w-full h-8 border-none focus:outline-none px-2"
                   />
                 </td>
                 <td className="border border-black w-1/4">
                   <input
                     type="number"
+                    required
+                    onChange={(e) => setSearchHotel({...SearchHotel, numberOfGuest: parseInt(e.target.value)})}
                     className="w-full h-8 border-none focus:outline-none px-2"
                   />
                 </td>
                 <td className="border border-black bg-orange-600 cursor-pointer">
-                  <Link to={"search"}><Search className=" px-2 w-12 text-white" /></Link>
+                  <button
+                    className="flex justify-center items-center"
+                    onClick={() => {
+                      localStorage.setItem("searchHotel", JSON.stringify(SearchHotel))
+                      navigate("/search", {state: SearchHotel});
+                    }}
+                  >
+                    <Search className=" px-2 w-12 text-white" />
+                  </button>
                 </td>
               </tr>
             </table>
