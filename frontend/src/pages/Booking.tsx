@@ -54,9 +54,10 @@ export default function Booking() {
   const [visitor, setVisitor] = useState<Visitor>({})
   const priceHotel = Number(localStorage.getItem("priceHotel"))
   const tax = Math.ceil(priceHotel * 0.05 + 150000);
-  const totalPrice = Math.ceil(priceHotel + tax);
   const storedData = localStorage.getItem("searchHotel") || "{}";
-  const { checkIn, checkOut, numberOfGuest } = JSON.parse(storedData);
+  const { checkIn, checkOut, numberOfGuest, numberOfDays } = JSON.parse(storedData);
+  const night = Number(numberOfDays);
+  const totalPrice = Math.ceil(priceHotel * night + tax);
   const [booking, setBooking] = useState<Booking>({
     checkIn: checkIn,
     checkOut: checkOut,
@@ -69,7 +70,6 @@ export default function Booking() {
       id: Number(localStorage.getItem("hotelId")),
     }
   })
-  console.log(booking);
   
 
   useEffect(() => {
@@ -257,7 +257,7 @@ export default function Booking() {
               <div className="flex flex-col p-4">
                 <div className="flex flex-row justify-between text-lg">
                   <p>Harga Kamar</p>
-                  <p>Rp. {hotel?.price.toLocaleString('id-ID')}</p>
+                  <p>Rp. {hotel?.price.toLocaleString('id-ID')} x <span className="text-xs font-bold text-orange-500">{night} Malam</span></p>
                 </div>
                 <p className="text-xs text-gray-500">{hotel?.city}: {hotel?.name} ({numberOfGuest} orang)</p>
                 <div className="flex flex-row justify-between text-lg pt-8">

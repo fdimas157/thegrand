@@ -16,7 +16,7 @@ export default function PopUpProfile({user} : {
 }){
     const navigate = useNavigate();
 
-    return <div className="h-72 w-56 bg-white absolute right-48 border-2 border-blue-600 rounded-xl top-16 flex gap-2 flex-col justify-center items-center p-4">
+    return <div className="h-72 w-56 bg-white absolute right-20 border-2 border-blue-600 rounded-xl top-16 flex gap-2 flex-col justify-center items-center p-4">
         <div className="font-rowdies text-center text-lg">{user.firstName} {user.lastName}</div>
         <CircleUserRound size={80}/>
         <div className="font-outfit text-xs">{user.email}</div>

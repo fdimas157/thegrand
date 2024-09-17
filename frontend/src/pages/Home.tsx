@@ -9,14 +9,16 @@ export interface SearchHotel {
   checkIn: string;
   checkOut: string;
   numberOfGuest: number;
+  numberOfDays: number;
 }
 
 export default function Home() {
-  const [SearchHotel, setSearchHotel] = useState<SearchHotel>({
+  const [searchHotel, setSearchHotel] = useState<SearchHotel>({
     city: "",
     checkIn: "",
     checkOut: "",
-    numberOfGuest: 0
+    numberOfGuest: 0,
+    numberOfDays: 0,
   })
   const [city, setCity] = useState<string>("Jakarta");
   const hotelDipslay = [
@@ -76,7 +78,13 @@ export default function Home() {
     },
   ]
   const navigate = useNavigate();
-
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  // const tomorrow = date.toISOString().split('T')[0];
+  // const today = new Date().toISOString().split('T')[0];
+  const [numberOfDays, setNumberOfDays] = useState(0);
+  
+  
   return (
     <>
       <Header />
@@ -93,71 +101,110 @@ export default function Home() {
           </p>
         </div>
         <div className="w-3/4 h-28 bg-white rounded-xl flex justify-center items-center absolute bottom-0 shadow-xl">
-          <form
+        <form
             action=""
             className="flex justify-center items-center font-noto text-center"
           >
-            <table >
-              <tr className="font-bold text-sm"> 
-                <td>Kota</td>
-                <td>Tanggal Check-In</td>
-                <td>Tanggal Check-Out</td>
-                <td>Jumlah Tamu</td>
-              </tr>
-              <tr className="font-outfit">
-                <td className="border border-black w-1/4">
-                  <select 
-                    value={city} 
-                    onChange={(e)=> {
-                      setCity(e.target.value);
-                      setSearchHotel({...SearchHotel, city: e.target.value})
-                      localStorage.setItem("city", e.target.value)
-                    }}
-                    className="w-full px-2 focus:outline-none"
-                  >
-                    <option value="Jakarta">Jakarta</option>
-                    <option value="Surabaya">Surabaya</option>
-                    <option value="Bandung">Bandung</option>
-                    <option value="Yogyakarta">Yogyakarta</option>
-                    <option value="Medan">Medan</option>
-                  </select>
-                </td>
-                <td className="border border-black w-1/4">
-                  <input
-                    type="date"
-                    required
-                    onChange={(e) => setSearchHotel({...SearchHotel, checkIn: e.target.value})}
-                    className="w-full h-8 border-none focus:outline-none px-2"
-                  />
-                </td>
-                <td className="border border-black w-1/4">
-                  <input
-                    type="date"
-                    required
-                    onChange={(e) => setSearchHotel({...SearchHotel, checkOut: e.target.value})}
-                    className="w-full h-8 border-none focus:outline-none px-2"
-                  />
-                </td>
-                <td className="border border-black w-1/4">
-                  <input
-                    type="number"
-                    required
-                    onChange={(e) => setSearchHotel({...SearchHotel, numberOfGuest: parseInt(e.target.value)})}
-                    className="w-full h-8 border-none focus:outline-none px-2"
-                  />
-                </td>
-                <td className="border border-black bg-orange-600 cursor-pointer">
-                  <button
-                    className="flex justify-center items-center"
-                    onClick={() => {
-                      localStorage.setItem("searchHotel", JSON.stringify(SearchHotel))
-                      navigate("/search", {state: SearchHotel});
-                    }}
-                  >
-                    <Search className=" px-2 w-12 text-white" />
-                  </button>
-                </td>
-              </tr>
+            <table>
+              <tbody>
+                <tr className="font-bold text-sm"> 
+                  <td>Kota</td>
+                  <td>Tanggal Check-In</td>
+                  <td>Tanggal Check-Out</td>
+                  <td>Jumlah Tamu</td>
+                </tr>
+                <tr className="font-outfit">
+                  <td className="border border-black w-1/4">
+                    <select 
+                      value="Jakarta"
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        setSearchHotel({...searchHotel, city: e.target.value});
+                        localStorage.setItem("city", e.target.value);
+                      }}
+                      className="w-full px-2 focus:outline-none"
+                    >
+                      <option value="Jakarta">Jakarta</option>
+                      <option value="Surabaya">Surabaya</option>
+                      <option value="Bandung">Bandung</option>
+                      <option value="Yogyakarta">Yogyakarta</option>
+                      <option value="Medan">Medan</option>
+                    </select>
+                  </td>
+                  <td className="border border-black w-1/4">
+                    <input
+                      type="date"
+                      required
+                      value={searchHotel.checkIn}
+                      onChange={(e) => {
+                        const newCheckIn = e.target.value;
+                        setSearchHotel(prev => {
+                          const newSearchHotel = { ...prev, checkIn: newCheckIn };
+                          if (newSearchHotel.checkOut) {
+                            const checkInDate = new Date(newSearchHotel.checkIn);
+                            const checkOutDate = new Date(newSearchHotel.checkOut);
+                            const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
+                            const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+                            setNumberOfDays(differenceInDays);
+                          }
+                          return newSearchHotel;
+                        });
+                      }}
+                      className="w-full h-8 border-none focus:outline-none px-2"
+                    />
+                  </td>
+                  <td className="border border-black w-1/4">
+                    <input
+                      type="date"
+                      required
+                      value={searchHotel.checkOut}
+                      onChange={(e) => {
+                        const newCheckOut = e.target.value;
+                        setSearchHotel(prev => {
+                          const newSearchHotel = { ...prev, checkOut: newCheckOut };
+                          if (newSearchHotel.checkIn) {
+                            const checkInDate = new Date(newSearchHotel.checkIn);
+                            const checkOutDate = new Date(newSearchHotel.checkOut);
+                            const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
+                            const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+                            setNumberOfDays(differenceInDays);
+                          }
+                          return newSearchHotel;
+                        });
+                      }}
+                      className="w-full h-8 border-none focus:outline-none px-2"
+                    />
+                  </td>
+                  <td className="border border-black w-1/4">
+                    <input
+                      type="number"
+                      required
+                      value={searchHotel.numberOfGuest}
+                      onChange={(e) => setSearchHotel({...searchHotel, numberOfGuest: parseInt(e.target.value), numberOfDays: numberOfDays})}
+                      className="w-full h-8 border-none focus:outline-none px-2"
+                    />
+                  </td>
+                  <td className="border border-black bg-orange-600 cursor-pointer">
+                    <button
+                      className="flex justify-center items-center"
+                      onClick={() => {
+                        if (!searchHotel.checkIn || !searchHotel.checkOut) {
+                          alert("Mohon lengkapi data terlebih dahulu");
+                          return;
+                        }
+                        if (!searchHotel.numberOfGuest) {
+                          alert("Mohon lengkapi data terlebih dahulu");
+                          return;
+                        }
+                        localStorage.setItem("searchHotel", JSON.stringify(searchHotel));
+                        navigate("/search", {state: searchHotel});
+                      }}
+                    >
+                      <Search className=" px-2 w-12 text-white" />
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </form>
         </div>

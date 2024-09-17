@@ -37,7 +37,7 @@ export default function Header() {
 
   return (
     <header>
-      <div className="flex flex-row justify-around p-4">
+      <div className="flex flex-row justify-between p-4 px-20">
         <Link to="/">
           <h1 className="font-rowdies text-blue-600 text-4xl">
             ng<span className="text-yellow-400">IN</span>ep

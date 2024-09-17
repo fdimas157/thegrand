@@ -36,7 +36,7 @@ export default function Search(){
             <HeaderSearch/>
             <div className="flex flex-row">
                 <div className="w-1/4 h-auto flex flex-col">
-                    <div className="text-center font-rowdies pt-8 text-xl">Filter Populer untuk Jakarta</div>
+                    <div className="text-center font-rowdies pt-8 text-xl">Filter Populer untuk {localStorage.getItem("city")}</div>
                     <div className="text-sm font-rowdies pl-8 pt-4">Fasilitas</div>
                     <div className="p-4">
                         <form action="" className="flex flex-col gap-3">
