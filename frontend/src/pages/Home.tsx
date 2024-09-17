@@ -116,7 +116,6 @@ export default function Home() {
                 <tr className="font-outfit">
                   <td className="border border-black w-1/4">
                     <select 
-                      value="Jakarta"
                       onChange={(e) => {
                         setCity(e.target.value);
                         setSearchHotel({...searchHotel, city: e.target.value});
@@ -124,6 +123,7 @@ export default function Home() {
                       }}
                       className="w-full px-2 focus:outline-none"
                     >
+                      <option value="">Pilih Kota</option>
                       <option value="Jakarta">Jakarta</option>
                       <option value="Surabaya">Surabaya</option>
                       <option value="Bandung">Bandung</option>

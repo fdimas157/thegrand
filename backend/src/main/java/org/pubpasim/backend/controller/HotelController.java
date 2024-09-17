@@ -38,6 +38,11 @@ public class HotelController {
         return hotelRepository.findById(id);
     }
 
+    @GetMapping("bycity/{city}")
+    public List<Hotel> getHotelById(@PathVariable String city) {
+        return hotelRepository.findByCity(city);
+    }
+
     @PostMapping
     public Hotel addNewHotel(@RequestBody Hotel hotel) {
         return hotelRepository.save(hotel);

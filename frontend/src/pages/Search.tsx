@@ -25,7 +25,7 @@ export default function Search(){
     const paginate = (pageNumber: number): void => setCurrentPage(pageNumber);
 
     useEffect(() => {
-        fetch("http://localhost:8084/api/hotel")
+        fetch("http://localhost:8084/api/hotel/bycity/" + localStorage.getItem("city"))
             .then((response) => response.json())
             .then((data) => setHotel(data));
     }, [])

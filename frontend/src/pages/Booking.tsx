@@ -51,7 +51,16 @@ export interface Booking{
 
 export default function Booking() {
   const [hotel, setHotel] = useState<Hotel>()
-  const [visitor, setVisitor] = useState<Visitor>({})
+  const [visitor, setVisitor] = useState<Visitor>({
+    id: 0,
+    firstName: "",
+    lastName: "",
+    age: 0,
+    address: "",
+    email: "",
+    password: "",
+    phone: ""
+  })
   const priceHotel = Number(localStorage.getItem("priceHotel"))
   const tax = Math.ceil(priceHotel * 0.05 + 150000);
   const storedData = localStorage.getItem("searchHotel") || "{}";
