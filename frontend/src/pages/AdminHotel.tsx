@@ -30,7 +30,7 @@ export interface Visitor{
   
   export interface Booking{
     id?: string,
-    createAt: string,
+    createdAt: string,
     checkIn: string,
     checkOut: string,
     numberOfGuest: number,
@@ -84,7 +84,7 @@ export default function AdminHotel() {
         }
     }, [hotel?.id]);
 
-    console.log(hotel)
+    
 
     return <div className="flex flex-row">
         <div className="w-1/5 bg-white h-screen absolute flex flex-col p-4 text-black gap-4">
@@ -278,7 +278,7 @@ export default function AdminHotel() {
                                         {currentBookings  && currentBookings .length > 0 ?
                                             currentBookings.map((booking) => (
                                                 <tr key={booking.id}>
-                                                    <td className="border-2 border-black">{booking.createAt}</td>
+                                                    <td className="border-2 border-black">{booking.createdAt}</td>
                                                     <td className="border-2 border-black">{booking.customerId.firstName} {booking.customerId.lastName}</td>
                                                     <td className="border-2 border-black">{booking.checkIn}</td>
                                                     <td className="border-2 border-black">{booking.checkOut}</td>

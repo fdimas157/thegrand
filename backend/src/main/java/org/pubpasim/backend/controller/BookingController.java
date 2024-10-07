@@ -114,6 +114,7 @@ public class BookingController {
         return bookingRepositoy.findById(id)
                 .map(bookingData -> {
                     bookingData.setCustomerId(booking.getCustomerId());
+                    bookingData.setCreatedAt(booking.getCreatedAt());
                     bookingData.setHotelId(booking.getHotelId());
                     bookingData.setCheckIn(booking.getCheckIn());
                     bookingData.setCheckOut(booking.getCheckOut());

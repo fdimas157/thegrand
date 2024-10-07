@@ -1,7 +1,8 @@
-import { BedDouble, CircleDollarSign, House, UsersRound, Search, SquarePlus, CircleX } from "lucide-react";
+import { BedDouble, CircleDollarSign, House, UsersRound, Search, CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
 import EditBooking from "../components/EditBooking";
 import EditHotel from "../components/EditHotel";
+import EditProfile from "../components/EditProfile";
 
 export interface Hotel{
     id: number,
@@ -53,6 +54,8 @@ export default function Admin(){
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [popUpEdit, setPopUpEdit] = useState<boolean>(false)
     const [editDataHotel, setEditDataHotel] = useState<Hotel>();
+    const [popUpEditVisitor, setPopUpEditVisitor] = useState<boolean>(false);
+    const [editDataVisitor, setEditDataVisitor] = useState<Visitor>();
     const itemsPerPage: number = 5;
     const indexOfLastItem: number = currentPage * itemsPerPage;
     const indexOfFirstItem: number = indexOfLastItem - itemsPerPage;
@@ -68,7 +71,6 @@ export default function Admin(){
         description: "",
         roomAvailable: 0,
     })
-    const income = dataBooking.reduce((acc, booking) => acc + booking.totalPrice, 0);
 
     useEffect(() => {
         fetch("http://localhost:8084/api/hotel")
@@ -292,6 +294,9 @@ export default function Admin(){
             {popUpEditBooking && (
                     <EditBooking booking={dataPopUpBooking} setBooking={setBooking} setPopUpEditBooking={setPopUpEditBooking}/>
                 )}
+            {popUpEditVisitor && (
+                <EditProfile setPopUpEditProfile={setPopUpEditVisitor} user={editDataVisitor}/>
+            )}
             {dashboard && (
                 <div className="text-black  w-full h-screen flex flex-col p-6">
                     <div className="font-rowdies text-3xl pt-4">Dashboard</div>
@@ -300,27 +305,28 @@ export default function Admin(){
                             <div className="bg-blue-600 h-48 w-1/3 rounded-lg">
                                 <div className="flex flex-col font-rowdies text-white p-6">
                                     <div className="text-xl">Jumlah Hotel</div>
-                                    <div className="flex justify-end w-full text-6xl items-end h-24">{dataHotel.length}</div>
+                                    <div className="text-xs font-outfit">Akumulasi hotel yang terdaftar</div>
+                                    <div className="flex justify-end w-full text-6xl items-end h-28">{dataHotel.length}</div>
                                 </div>
                             </div>
                             <div className="bg-blue-600 h-48 w-1/3 rounded-lg">
                             <div className="flex flex-col font-rowdies text-white p-6">
                                     <div className="text-xl">Jumlah Pengunjung</div>
+                                    <div className="text-xs font-outfit">Akumulasi tamu yang terdaftar</div>
                                     <div className="flex justify-end w-full text-6xl items-end h-24">{dataVisitor.length}</div>
                                 </div>
                             </div>
                             <div className="bg-blue-600 h-48 w-1/3 rounded-lg">
                             <div className="flex flex-col font-rowdies text-white p-6">
                                     <div className="text-xl">Jumlah Pemesanan</div>
+                                    <div className="text-xs font-outfit">Akumulasi pemesanan diseluruh partner</div>
                                     <div className="flex justify-end w-full text-6xl items-end h-24">{dataBooking.length}</div>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-blue-600 h-40 rounded-lg">
-                            <div className="flex flex-col font-rowdies text-white p-6">
-                                <div className="text-xl ">Total Pemasukan</div>
-                                <div className="flex justify-end items-end w-full text-5xl h-16">Rp. {income.toLocaleString('id-ID')}</div>
-                            </div>
+                        <div className="flex flex-col justify-center items-center pt-8 ">
+                            <div className="font-rowdies text-2xl">Kunci Sukses Operasional Hotel Anda dalam Satu Tampilan</div>
+                            <div className="text-xs font-outfit text-center px-10 pt-4">Dengan dashboard ini, Anda dapat menggali lebih dalam preferensi tamu, sehingga Anda dapat menargetkan mereka dengan penawaran yang lebih relevan dan meningkatkan tingkat kepuasan mereka.</div>
                         </div>
                     </div>
                 </div>
@@ -461,20 +467,28 @@ export default function Admin(){
                                     </td>
                                     <td className="border-2 border-black">{guest.phone}</td>
                                     <td className="border-2 border-black p-2">
-                                        <button 
-                                            onClick={() => {
-                                                fetch(`http://localhost:8084/api/customer/${guest.id}`,{
-                                                    method: "DELETE"
-                                                }).then((response) => {
-                                                    if(response.ok){
-                                                        setDataVisitor(dataVisitor.filter((v) => v.id !== guest.id))
-                                                    }
-                                                })
-                                            }}  
-                                            className="p-2 bg-red-600 text-white rounded font-rowdies"
-                                        >
-                                            Hapus
-                                        </button>
+                                        <div className="flex flex-row gap-2 justify-center">
+                                            <button
+                                                onClick={() => {
+                                                    setEditDataVisitor(guest);
+                                                    setPopUpEditVisitor(true);
+                                                }}
+                                                className="p-2 bg-blue-600 text-white rounded font-rowdies">Edit</button>
+                                            <button 
+                                                onClick={() => {
+                                                    fetch(`http://localhost:8084/api/customer/${guest.id}`,{
+                                                        method: "DELETE"
+                                                    }).then((response) => {
+                                                        if(response.ok){
+                                                            setDataVisitor(dataVisitor.filter((v) => v.id !== guest.id))
+                                                        }
+                                                    })
+                                                }}  
+                                                className="p-2 bg-red-600 text-white rounded font-rowdies"
+                                            >
+                                                Hapus
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

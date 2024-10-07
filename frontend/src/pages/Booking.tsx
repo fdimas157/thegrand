@@ -38,6 +38,7 @@ export interface Visitor{
 
 export interface Booking{
   id?: string,
+  createdAt: string,
   checkIn: string,
   checkOut: string,
   numberOfGuest: number,
@@ -71,6 +72,7 @@ export default function Booking() {
   const night = Number(numberOfDays);
   const total = priceHotel * night;
   const [booking, setBooking] = useState<Booking>({
+    createdAt: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
     checkIn: checkIn,
     checkOut: checkOut,
     numberOfGuest: numberOfGuest,
