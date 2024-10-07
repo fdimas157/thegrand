@@ -4,6 +4,7 @@ import { IoStar, IoStarHalf } from "react-icons/io5";
 import { TbDisabled, TbHours24 } from "react-icons/tb";
 import { useEffect, useState } from "react";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 export interface SearchHotel {
   city: string;
@@ -36,11 +37,12 @@ export interface Visitor{
 }
 
 export interface Booking{
-  id?: number,
+  id?: string,
   checkIn: string,
   checkOut: string,
   numberOfGuest: number,
   totalPrice: number,
+  nights: number,
   customerId: {
     id:number
   },
@@ -48,6 +50,7 @@ export interface Booking{
     id:number
   },
 }
+
 
 export default function Booking() {
   const [hotel, setHotel] = useState<Hotel>()
@@ -61,25 +64,25 @@ export default function Booking() {
     password: "",
     phone: ""
   })
+  const navigate = useNavigate();
   const priceHotel = Number(localStorage.getItem("priceHotel"))
-  const tax = Math.ceil(priceHotel * 0.05 + 150000);
   const storedData = localStorage.getItem("searchHotel") || "{}";
   const { checkIn, checkOut, numberOfGuest, numberOfDays } = JSON.parse(storedData);
   const night = Number(numberOfDays);
-  const totalPrice = Math.ceil(priceHotel * night + tax);
+  const total = priceHotel * night;
   const [booking, setBooking] = useState<Booking>({
     checkIn: checkIn,
     checkOut: checkOut,
     numberOfGuest: numberOfGuest,
-    totalPrice: totalPrice,
+    totalPrice: total,
+    nights: numberOfDays,
     customerId: {
-      id: Number(localStorage.getItem("customerId")),
+      id: Number(localStorage.getItem("customerId"))
     },
     hotelId: {
-      id: Number(localStorage.getItem("hotelId")),
+      id: Number(localStorage.getItem("hotelId"))
     }
   })
-  
 
   useEffect(() => {
     fetch(`http://localhost:8084/api/hotel/byid/${localStorage.getItem('hotel')}`)
@@ -89,7 +92,7 @@ export default function Booking() {
           localStorage.setItem("hotelId", data.id.toString());
           localStorage.setItem("priceHotel", data.price.toString());
         });
-  }, [])
+  }, [hotel?.id])
 
   useEffect(() => {
     fetch(`http://localhost:8084/api/customer/byemail/${localStorage.getItem('user')}`)
@@ -97,12 +100,71 @@ export default function Booking() {
         .then((data) => {
           setVisitor(data)
           localStorage.setItem("customerId", data.id.toString());
+          
         });
-  }, [])
+  }, [visitor?.id])
 
+  console.log(booking);
 
+  const handlePayment = async () => {
+    try {
+        const response = await fetch('http://localhost:8084/api/booking', { 
+          method: 'POST', 
+          headers: { 
+            'Content-Type': 'application/json' 
+          }, 
+          body: JSON.stringify(booking)}); // Ganti dengan URL backend Anda
+          const snapToken = await response.text();
 
+        if (snapToken.includes("Failed")) {
+            alert("Gagal mendapatkan token pembayaran.");
+            return;
+        }
 
+        window.snap.pay(snapToken, {
+            onSuccess: function(result){
+                console.log('payment success:', result);
+                fetch('http://localhost:8084/api/booking/add', { 
+                  method: 'POST', 
+                  headers: { 
+                    'Content-Type': 'application/json' 
+                  }, 
+                  body: JSON.stringify(booking)}
+                );
+                fetch(`http://localhost:8084/api/hotel/update/${booking.hotelId.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(
+                      hotel
+                    )
+                })
+                localStorage.removeItem('searchHotel')
+                localStorage.removeItem('hotel')
+                localStorage.removeItem('customerId')
+                localStorage.removeItem('priceHotel')
+                navigate("/profile");
+            },
+            onPending: function(result){
+                console.log('payment pending:', result);
+                alert('Pembayaran sedang diproses.');
+            },
+            onError: function(result){
+                console.log('payment error:', result);
+                alert('Pembayaran gagal.');
+            },
+            onClose: function(){
+                console.log('payment popup closed');
+                alert('Pembayaran dibatalkan.');
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching Snap Token:', error);
+        alert('Terjadi kesalahan saat memulai pembayaran.');
+    }
+};
+  
   return (
     <>
       <HeaderSearch />
@@ -269,38 +331,20 @@ export default function Booking() {
                   <p>Rp. {hotel?.price.toLocaleString('id-ID')} x <span className="text-xs font-bold text-orange-500">{night} Malam</span></p>
                 </div>
                 <p className="text-xs text-gray-500">{hotel?.city}: {hotel?.name} ({numberOfGuest} orang)</p>
-                <div className="flex flex-row justify-between text-lg pt-8">
-                  <p>Pajak dan Biaya</p>
-                  <p>Rp. {tax.toLocaleString('id-ID')}</p>
+                <div className="flex flex-row justify-between text-lg pt-8 h-20">
                 </div>
                 <hr className="mt-2"/>
                 <div className="flex flex-row justify-between text-lg pt-2 font-bold">
-                  <p>Pajak dan Biaya</p>
-                  <p>Rp. {totalPrice.toLocaleString('id-ID')}</p>
+                  <p>Total Harga</p>
+                  <p>Rp. {total.toLocaleString('id-ID')}</p>
                 </div>
                 <div className="flex justify-center pt-4 flex-col items-center gap-2">
                   <p className="text-xs text-blue-600 font-bold flex flex-row gap-2 items-center"><AlarmClock size={16}/>Pesan sekarang sebelum harga berubah!</p>
-                  <button onClick={async (e) => {
-                    e.preventDefault();
-                    try {
-                        const customerResponse = await fetch("http://localhost:8084/api/booking/add", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(booking),
-                        });
-                        if (!customerResponse.ok) {
-                            throw new Error(`Error: ${customerResponse.status} ${customerResponse.statusText}`);
-                        }
-                        const customerResult = await customerResponse.json();
-                        console.log("Customer created successfully:", customerResult);
-                        alert("Booking success");
-                    } catch (error) {
-                        console.error("Error occurred:", error);
-                        alert("Failed to submit data. Please try again later.");
-                    }
-                }}
+                  <button 
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      handlePayment();
+                    }}
                     className="bg-orange-500 w-40 text-sm font-outfit font-bold h-10 rounded-lg text-white">Booking Sekarang</button>
                 </div>
               </div>

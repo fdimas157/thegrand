@@ -37,9 +37,9 @@ export default function Header() {
 
   return (
     <header>
-      <div className="flex flex-row justify-between p-4 px-20">
+      <div className="flex flex-row justify-between p-4 px-20 bg-blue-600">
         <Link to="/">
-          <h1 className="font-rowdies text-blue-600 text-4xl">
+          <h1 className="font-rowdies text-white text-4xl">
             ng<span className="text-yellow-400">IN</span>ep
           </h1>
         </Link>
@@ -47,7 +47,7 @@ export default function Header() {
           
           {user?.firstName ? (
             <div className="flex items-center gap-4">
-              <div className="font-rowdies">Selamat Datang {user.firstName || "Pengguna"}</div>
+              <div className="font-rowdies text-white">Selamat Datang {user.firstName || "Pengguna"}</div>
               <CircleUserRound
                 className="text-white bg-blue-600 rounded-full cursor-pointer"
                 size={40}
@@ -58,7 +58,7 @@ export default function Header() {
             <div className="flex flex-row gap-4">
               <Link
                 to="/register"
-                className="text-black border-2 border-black p-1 font-rowdies w-28 text-sm rounded-lg h-8 flex justify-center items-center"
+                className="text-black border-2 border-black p-1 font-rowdies w-28 text-sm rounded-lg h-8 flex justify-center items-center bg-white"
               >
                 Daftar
               </Link>

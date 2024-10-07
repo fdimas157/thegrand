@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface HotelRepository extends JpaRepository<Hotel, Long>{
     Optional<Hotel> findById(Long id);
     List<Hotel> findByCity(String city);
+    Optional<Hotel> findByEmail(String name);
 }

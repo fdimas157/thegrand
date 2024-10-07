@@ -20,10 +20,15 @@ export default function PopUpProfile({user} : {
         <div className="font-rowdies text-center text-lg">{user.firstName} {user.lastName}</div>
         <CircleUserRound size={80}/>
         <div className="font-outfit text-xs">{user.email}</div>
-        <button className="font-rowdies h-8 bg-blue-600 text-white w-3/4 text-xs rounded-lg">Lihat Profil</button>
+        <button 
+            onClick={() => navigate("/profile")}
+            className="font-rowdies h-8 bg-blue-600 text-white w-3/4 text-xs rounded-lg" 
+        >
+            Lihat Profil
+        </button>
         <button 
             onClick={() => {
-                localStorage.clear();
+                localStorage.removeItem('user');
                 navigate("/login");
             }} 
             className="font-rowdies h-8 text-blue-600 text-xs rounded-lg underline"

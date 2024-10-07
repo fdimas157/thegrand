@@ -53,15 +53,15 @@ export default function LoginHotel(){
                             <div className="font-outfit text-xs w-3/4 text-left text-red-600">Password salah</div> : <div className="font-outfit text-xs text-white">Password salah</div>
                         }
                         <input
-                        type={showPassword ? "text" : "password"}
-                        onChange={(e) => setLogin({...login, password: e.target.value})}
-                        className="border-2 border-black h-10 w-full rounded-lg px-2"
-                        placeholder="Masukan password"
+                            type={showPassword ? "text" : "password"}
+                            onChange={(e) => setLogin({...login, password: e.target.value})}
+                            className="border-2 border-black h-10 w-full rounded-lg px-2"
+                            placeholder="Masukan password"
                         />
                         <button
-                        type="button"
-                        onClick={togglePasswordVisibility}
-                        className="absolute right-2 top-6 text-sm text-blue-600 hover:underline"
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className="absolute right-2 top-6 text-sm text-blue-600 hover:underline"
                         >
                         {showPassword ? <EyeOff /> : <Eye />}
                         </button>
@@ -82,7 +82,7 @@ export default function LoginHotel(){
                                   navigate("/");
                                 } else {
                                     setWrongEmail(false);
-                                  setWrongPassword(true);
+                                    setWrongPassword(true);
                                 }
                               })
                               .catch(() => {
@@ -96,7 +96,7 @@ export default function LoginHotel(){
                     <div className="flex flex-row text-sm gap-2">
                         <div>Belum punya akun?</div>
                         <Link to="/register" className="font-bold text-orange-500 cursor-pointer hover:underline">
-                        Daftar
+                            Daftar
                         </Link>
                     </div>
                 </form>

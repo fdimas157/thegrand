@@ -17,19 +17,57 @@ export interface Hotel{
 
 export default function Search(){
     const [hotel, setHotel] = useState<Hotel[]>([]);
+    const [filteredHotels, setFilteredHotels] = useState<Hotel[]>([]); // State untuk hotel yang sudah difilter
+    const [, setSelectedPriceRange] = useState<number[]>([]); // State untuk menyimpan kisaran harga yang dipilih
+    const [selectedAccommodations, setSelectedAccommodations] = useState<string[]>([]); // State untuk tipe akomodasi yang dipilih
     const [currentPage, setCurrentPage] = useState<number>(1);
     const itemsPerPage: number = 8;
     const indexOfLastItem: number = currentPage * itemsPerPage;
     const indexOfFirstItem: number = indexOfLastItem - itemsPerPage;
-    const currentHotels: Hotel[] = hotel.slice(indexOfFirstItem, indexOfLastItem);
+    const currentHotels: Hotel[] = filteredHotels.slice(indexOfFirstItem, indexOfLastItem);
     const paginate = (pageNumber: number): void => setCurrentPage(pageNumber);
+
 
     useEffect(() => {
         fetch("http://localhost:8084/api/hotel/bycity/" + localStorage.getItem("city"))
             .then((response) => response.json())
-            .then((data) => setHotel(data));
-    }, [])
+            .then((data) => {
+                setHotel(data);
+                setFilteredHotels(data); // Atur data awal untuk filteredHotels
+            });
+    }, []);
 
+    const handlePriceFilter = (priceRange: number[]) => {
+        setSelectedPriceRange(priceRange);
+
+        // Filter hotel berdasarkan kisaran harga yang dipilih
+        const filtered = hotel.filter(h =>
+            (priceRange.length === 0) || (h.price >= priceRange[0] && h.price <= priceRange[1])
+        );
+        setFilteredHotels(filtered);
+        setCurrentPage(1); // Reset halaman ke 1 setelah filter diterapkan
+    };
+
+    // Fungsi untuk menangani perubahan tipe akomodasi
+    const handleAccommodationChange = (type: string) => {
+        if (selectedAccommodations.includes(type)) {
+            setSelectedAccommodations(selectedAccommodations.filter(item => item !== type)); // Hapus jika sudah dipilih
+        } else {
+            setSelectedAccommodations([...selectedAccommodations, type]); // Tambah tipe baru
+        }
+    };
+
+    const applyFilters = () => {
+        let filtered = hotel;
+
+        // Filter berdasarkan tipe akomodasi jika ada yang dipilih
+        if (selectedAccommodations.length > 0) {
+            filtered = filtered.filter(h => selectedAccommodations.includes(h.type));
+        }
+
+        setFilteredHotels(filtered);
+        setCurrentPage(1); // Reset halaman ke 1 setelah filter diterapkan
+    };
     
     return (
         <>
@@ -37,88 +75,114 @@ export default function Search(){
             <div className="flex flex-row">
                 <div className="w-1/4 h-auto flex flex-col">
                     <div className="text-center font-rowdies pt-8 text-xl">Filter Populer untuk {localStorage.getItem("city")}</div>
-                    <div className="text-sm font-rowdies pl-8 pt-4">Fasilitas</div>
-                    <div className="p-4">
-                        <form action="" className="flex flex-col gap-3">
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Kamar Mandi Dalam
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Kolam Renang
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                AC
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Free WiFi
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Hewan peliharaan diizinkan
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Parkir
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Repsesionis 24 Jam
-                            </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
-                                Balkon
-                            </label>
-                            <button className="font-rowdies bg-blue-600 text-white rounded h-6 text-sm">Perbarui</button>
-                        </form>
-                    </div>
                     <div className="text-sm font-rowdies pl-8 pt-4">Kisaran Harga</div>
                     <div className="p-4">
-                        <form action="" className="flex flex-col gap-3">
+                    <form className="flex flex-col gap-3">
                             <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                                <input
+                                    type="radio"
+                                    name="price"
+                                    className="w-4 h-4"
+                                    onChange={() => handlePriceFilter([100000, 200000])}
+                                />
                                 Rp. 100.000 - Rp. 200.000
                             </label>
                             <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                                <input
+                                    type="radio"
+                                    name="price"
+                                    className="w-4 h-4"
+                                    onChange={() => handlePriceFilter([200000, 500000])}
+                                />
                                 Rp. 200.000 - Rp. 500.000
                             </label>
                             <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                                <input
+                                    type="radio"
+                                    name="price"
+                                    className="w-4 h-4"
+                                    onChange={() => handlePriceFilter([500000, 1000000])}
+                                />
                                 Rp. 500.000 - Rp. 1.000.000
                             </label>
                             <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                                <input
+                                    type="radio"
+                                    name="price"
+                                    className="w-4 h-4"
+                                    onChange={() => handlePriceFilter([1000000, 2000000])}
+                                />
                                 Rp. 1.000.000 - Rp. 2.000.000
                             </label>
-                            <button className="font-rowdies bg-blue-600 text-white rounded h-6 text-sm">Perbarui</button>
+                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
+                                <input
+                                    type="radio"
+                                    name="price"
+                                    className="w-4 h-4"
+                                    onChange={() => handlePriceFilter([2000000, 5000000])}
+                                />
+                                Rp. 2.000.000 - Rp. 5.000.000
+                            </label>
+                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
+                                <input
+                                    type="radio"
+                                    name="price"
+                                    className="w-4 h-4"
+                                    onChange={() => handlePriceFilter([])} // Tidak ada filter jika tidak ada kisaran harga
+                                />
+                                Semua Harga
+                            </label>
                         </form>
                     </div>
                     <div className="text-sm font-rowdies pl-8 pt-4">Tipe Akomodasi</div>
                     <div className="p-4">
                         <form action="" className="flex flex-col gap-3">
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                            <label className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4"
+                                    onChange={() => handleAccommodationChange("Hotel")}
+                                    checked={selectedAccommodations.includes("Hotel")}
+                                />
                                 Hotel
                             </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                            <label className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4"
+                                    onChange={() => handleAccommodationChange("Apartemen")}
+                                    checked={selectedAccommodations.includes("Apartemen")}
+                                />
                                 Apartemen
                             </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                            <label className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4"
+                                    onChange={() => handleAccommodationChange("Vila")}
+                                    checked={selectedAccommodations.includes("Vila")}
+                                />
                                 Vila
                             </label>
-                            <label htmlFor="" className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
-                                <input type="checkbox" className="w-4 h-4"/>
+                            <label className="flex flex-row items-center font-rowdies text-xs gap-2 pl-4">
+                                <input
+                                    type="checkbox"
+                                    className="w-4 h-4"
+                                    onChange={() => handleAccommodationChange("Guest House")}
+                                    checked={selectedAccommodations.includes("Guest House")}
+                                />
                                 Guest House
                             </label>
-                            <button className="font-rowdies bg-blue-600 text-white rounded h-6 text-sm">Perbarui</button>
+                            <button
+                                type="button"
+                                className="font-rowdies bg-blue-600 text-white rounded h-6 text-sm"
+                                onClick={applyFilters}
+                            >
+                                Perbarui
+                            </button>
                         </form>
                     </div>
+                    
                 </div>
                 <div className="w-3/4 h-auto p-4 font-rowdies text-xs">
                     {currentHotels.map((h) => (    

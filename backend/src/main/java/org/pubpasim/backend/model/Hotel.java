@@ -20,5 +20,23 @@ public class Hotel {
     private String picture;
     private String description;
     private Integer roomAvailable;
+    private String email;
+    private String password;
 
+    public Hotel() {}
+
+    public Hotel(Long id, String name, String type, String city, String address, Long price, String picture,
+            String description, Integer roomAvailable, String email, String password) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.city = city;
+        this.address = address;
+        this.price = price;
+        this.picture = picture;
+        this.description = description;
+        this.roomAvailable = roomAvailable;
+        this.email = email;
+        this.password = password;
+    }
 }

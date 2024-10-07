@@ -45,11 +45,17 @@ export default function CardHotel({ hotel }: { hotel: Hotel }) {
         <div className="text-sm text-green-600 pb-4">25% OFF</div>
         <div className="line-through text-gray-400 text-sm">Rp. {priceBefore.toLocaleString('id-ID')}</div>
         <div className="text-3xl text-orange-500">Rp. {hotel.price.toLocaleString('id-ID')}</div>
-        <div className="font-outfit text-xs pb-4">Sudah termasuk pajak & biaya</div>
+        <div className="font-outfit text-xs pb-4">Belum termasuk pajak & biaya</div>
         <button
           onClick={() => {
-            localStorage.setItem('hotel', JSON.stringify(hotel.id));
-            navigate("/booking");
+            if (localStorage.getItem('user') === null) {
+              navigate("/login");
+            }
+            else{
+              localStorage.setItem('hotel', JSON.stringify(hotel.id));
+              navigate("/booking");
+              window.location.reload();
+            }
           }}
           className="bg-orange-500 hover:bg-orange-600 h-10 w-7/12 rounded-xl text-xs text-white">Booking Sekarang</button>
       </div>

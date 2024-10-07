@@ -1,5 +1,7 @@
 import { BedDouble, CircleDollarSign, House, UsersRound, Search, SquarePlus, CircleX } from "lucide-react";
 import { useEffect, useState } from "react";
+import EditBooking from "../components/EditBooking";
+import EditHotel from "../components/EditHotel";
 
 export interface Hotel{
     id: number,
@@ -10,12 +12,15 @@ export interface Hotel{
     price: number,
     picture: string,
     description: string,
-    roomAvailable: number
+    roomAvailable: number,
+    email: string,
+    password: string
 }
 
 export interface Visitor{
     id: number,
-    name: string,
+    firstName: string,
+    lastName: string,
     age: number,
     address: string,
     email: string,
@@ -30,6 +35,7 @@ export interface Booking{
     checkIn: string,
     checkOut: string,
     numberOfGuest: number,
+    nights: number,
     totalPrice: number
 }
 
@@ -38,12 +44,15 @@ export default function Admin(){
     const [hotel, setHotel] = useState<boolean>(false)
     const [visitor, setVisitor] = useState<boolean>(false)
     const [booking, setBooking] = useState<boolean>(false)
-    const [cancel, setCancel] = useState<boolean>(false);
     const [popUpAdd, setPopUpAdd] = useState<boolean>(false)
+    const [popUpEditBooking, setPopUpEditBooking] = useState<boolean>(false)
+    const [dataPopUpBooking, setDataPopUpBooking] = useState<Booking>()
     const [dataHotel, setDataHotel] = useState<Hotel[]>([]);
     const [dataVisitor, setDataVisitor] = useState<Visitor[]>([]);
     const [dataBooking, setDataBooking] = useState<Booking[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [popUpEdit, setPopUpEdit] = useState<boolean>(false)
+    const [editDataHotel, setEditDataHotel] = useState<Hotel>();
     const itemsPerPage: number = 5;
     const indexOfLastItem: number = currentPage * itemsPerPage;
     const indexOfFirstItem: number = indexOfLastItem - itemsPerPage;
@@ -59,6 +68,7 @@ export default function Admin(){
         description: "",
         roomAvailable: 0,
     })
+    const income = dataBooking.reduce((acc, booking) => acc + booking.totalPrice, 0);
 
     useEffect(() => {
         fetch("http://localhost:8084/api/hotel")
@@ -93,7 +103,6 @@ export default function Admin(){
                     setBooking(false);
                     setHotel(false);
                     setVisitor(false);
-                    setCancel(false);
                 }} 
                 className="mt-8 bg-white w-full text-blue-600 font-rowdies text-sm rounded h-12 cursor-pointer flex items-center p-2 gap-2 border-4 border-white hover:border-yellow-400">
                 <House />
@@ -104,7 +113,6 @@ export default function Admin(){
                     setDashboard(false);
                     setBooking(false);
                     setVisitor(false);
-                    setCancel(false);
                 }}   
                 className=" bg-white w-full text-blue-600 font-rowdies text-sm rounded h-12 cursor-pointer flex items-center p-2 gap-2 border-4 border-white hover:border-yellow-400">
                 <BedDouble />
@@ -115,7 +123,6 @@ export default function Admin(){
                     setHotel(false);
                     setDashboard(false);
                     setBooking(false);
-                    setCancel(false);
                 }}    
                 className=" bg-white w-full text-blue-600 font-rowdies text-sm rounded h-12 cursor-pointer flex items-center p-2 gap-2 border-4 border-white hover:border-yellow-400">
                 <UsersRound />
@@ -126,11 +133,10 @@ export default function Admin(){
                     setVisitor(false);
                     setHotel(false);
                     setDashboard(false);
-                    setCancel(false);
                 }}   
                 className=" bg-white w-full text-blue-600 font-rowdies text-sm rounded h-12 cursor-pointer flex items-center p-2 gap-2 border-4 border-white hover:border-yellow-400">
                 <CircleDollarSign />
-                Booking
+                Pemesanan Hotel
             </div>     
         </div>
         <div className="w-4/5 h-screen">
@@ -277,6 +283,15 @@ export default function Admin(){
                     </div>
                 </div>
             )}
+            {popUpEdit && (
+                    <EditHotel
+                        setPopUpEdit={setPopUpEdit}
+                        hotel={editDataHotel} 
+                    />
+                )}
+            {popUpEditBooking && (
+                    <EditBooking booking={dataPopUpBooking} setBooking={setBooking} setPopUpEditBooking={setPopUpEditBooking}/>
+                )}
             {dashboard && (
                 <div className="text-black  w-full h-screen flex flex-col p-6">
                     <div className="font-rowdies text-3xl pt-4">Dashboard</div>
@@ -302,10 +317,10 @@ export default function Admin(){
                             </div>
                         </div>
                         <div className="bg-blue-600 h-40 rounded-lg">
-                        <div className="flex flex-col font-rowdies text-white p-6">
-                                    <div className="text-xl ">Total Pemasukan</div>
-                                    <div className="flex justify-end items-end w-full text-5xl h-16">Rp. 1.000.000.000</div>
-                                </div>
+                            <div className="flex flex-col font-rowdies text-white p-6">
+                                <div className="text-xl ">Total Pemasukan</div>
+                                <div className="flex justify-end items-end w-full text-5xl h-16">Rp. {income.toLocaleString('id-ID')}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -322,12 +337,6 @@ export default function Admin(){
                                 </button>
                             </div>
                         </form>
-                        <button
-                            onClick={() => setPopUpAdd(true)}
-                            className="bg-green-600 hover:bg-green-700 text-white p-2 font-rowdies text-xs w-36 flex flex-row justify-center items-center gap-2 rounded-lg">
-                            Tambah Hotel 
-                            <SquarePlus size={16}/>
-                        </button>
                     </div>
                     <div className="mt-4">
                         <table className="w-full border-2 border-black text-xs">
@@ -335,11 +344,11 @@ export default function Admin(){
                                 <th className="border-2 border-black">Name</th>
                                 <th className="border-2 border-black">Type</th>
                                 <th className="border-2 border-black">City</th>
-                                {/* <th className="border-2 border-black">Address</th> */}
+                                <th className="border-2 border-black">Address</th>
                                 <th className="border-2 border-black">Price</th>
                                 <th className="border-2 border-black">Picture</th>
-                                {/* <th className="border-2 border-black p-2">Description</th> */}
                                 <th className="border-2 border-black p-2">Room Available</th>
+                                <th className="border-2 border-black p-2">Email</th>
                                 <th className="border-2 border-black">Action</th>
                             </tr>
                             {currentItems.map((hotel) => (
@@ -347,7 +356,7 @@ export default function Admin(){
                                     <td className="border-2 border-black p-2">{hotel.name}</td>
                                     <td className="border-2 border-black p-2">{hotel.type}</td>
                                     <td className="border-2 border-black p-2">{hotel.city}</td>
-                                    {/* <td className="border-2 border-black p-2">{hotel.address}</td> */}
+                                    <td className="border-2 border-black p-2">{hotel.address}</td>
                                     <td className="border-2 border-black p-2">{hotel.price}</td>
                                     <td className="border-2 border-black p-1">
                                         <div className="flex justify-center items-center">
@@ -356,19 +365,30 @@ export default function Admin(){
                                     </td>
                                     {/* <td className="border-2 border-black p-2">{hotel.description}</td> */}
                                     <td className="border-2 border-black w-20 p-2">{hotel.roomAvailable}</td>
+                                    <td className="border-2 border-black w-20 p-2">{hotel.email}</td>
                                     <td className="border-2 border-black w-20 p-2">
                                         <div className="flex flex-row gap-2 justify-center font-rowdies p-2">
                                             <button
+                                                onClick={() => {
+                                                    setEditDataHotel(hotel);
+                                                    setPopUpEdit(true)
+                                                }}
                                                 className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">Edit</button>
                                             <button
                                                 onClick={() => {
-                                                    fetch(`http://localhost:8084/api/hotel/${hotel.id}`,{
-                                                        method: "DELETE"
-                                                    }).then((response) => {
-                                                        if(response.ok){
-                                                            setDataHotel(dataHotel.filter((h) => h.id !== hotel.id))
+                                                    if (confirm(`Apakah anda yakin ingin menghapus data hotel ${hotel.name}?`)) {
+                                                        if (confirm(`Jika anda menghapus data hotel ${hotel.name}, maka semua pemesanan di hotel tersebut akan dihapus, Apakah anda ingin tetap melanjutkannya?`)) {
+                                                            alert(`Data ${hotel.name} berhasil di hapus`);
+                                                            fetch(`http://localhost:8084/api/hotel/${hotel.id}`,{
+                                                                method: "DELETE"
+                                                            }).then((response) => {
+                                                                if(response.ok){
+                                                                    setDataHotel(dataHotel.filter((h) => h.id !== hotel.id));
+                                                                    location.reload();
+                                                                }
+                                                            })
                                                         }
-                                                    })
+                                                    }
                                                 }}  
                                                 className="p-2 bg-red-600 text-white rounded hover:bg-red-700">Hapus</button>
                                         </div>
@@ -432,11 +452,13 @@ export default function Admin(){
                             {dataVisitor.map((guest) => (
                                 <tr key={guest.id} className="font-noto text-center text-xs">
                                     <td className="border-2 border-black">{guest.id}</td>
-                                    <td className="border-2 border-black">{guest.name}</td>
+                                    <td className="border-2 border-black">{guest.firstName} {guest.lastName}</td>
                                     <td className="border-2 border-black">{guest.age}</td>
                                     <td className="border-2 border-black">{guest.address}</td>
                                     <td className="border-2 border-black">{guest.email}</td>
-                                    <td className="border-2 border-black">{guest.password}</td>
+                                    <td className="border-2 border-black">
+                                        {"*".repeat(guest.password.length)}
+                                    </td>
                                     <td className="border-2 border-black">{guest.phone}</td>
                                     <td className="border-2 border-black p-2">
                                         <button 
@@ -462,11 +484,15 @@ export default function Admin(){
             )}
             {booking && (
                 <div className="text-black  w-full h-screen flex flex-col p-6">
-                    <div className="font-rowdies text-3xl pt-4">Booking</div>
+                    <div className="font-rowdies text-3xl pt-4">Pemesanan Hotel</div>
                     <div className="flex flex-row justify-between  items-end">
                         <form action="" className="flex justify-between mt-8">
                             <div className="flex flex-row items-center">
-                                <input type="text" className="h-8 border-2 border-black p-2 font-rowdies rounded-s-lg text-xs" placeholder="Cari ...."/>
+                                <input 
+                                    type="text" 
+                                    className="h-8 border-2 border-black p-2 font-rowdies rounded-s-lg text-xs" 
+                                    placeholder="Cari ...."
+                                />
                                 <button className="bg-yellow-400 w-9  h-8 p-1 border-2 border-black rounded-e-lg border-l-0">
                                     <Search size={20}/>
                                 </button>
@@ -476,68 +502,51 @@ export default function Admin(){
                     <div className="mt-4">
                         <table className="w-full border-2 border-black text-xs">
                             <tr className="bg-blue-600 text-white">
-                                <th className="border-2 border-black">Id</th>
-                                <th className="border-2 border-black">Visitor Name</th>
-                                <th className="border-2 border-black">Hotel</th>
-                                <th className="border-2 border-black">Check In Date</th>
-                                <th className="border-2 border-black">Check Out Date</th>
-                                <th className="border-2 border-black">Guest</th>
-                                <th className="border-2 border-black">Total Price</th>
+                                <th className="border-2 border-black">Nama Tamu</th>
+                                <th className="border-2 border-black">Nama Hotel</th>
+                                <th className="border-2 border-black">Tanggal Check In</th>
+                                <th className="border-2 border-black">Tanggal Check Out</th>
+                                <th className="border-2 border-black">Jumlah Tamu</th>
+                                <th className="border-2 border-black">Lama Menginap</th>
+                                <th className="border-2 border-black">Total Harga</th>
                                 <th className="border-2 border-black p-2">Action</th>
                             </tr>
-                            {dataBooking.map((book) => (
-                                <tr key={book.id} className="font-noto text-center text-xs">
-                                    <td className="border-2 border-black">{book.id}</td>
-                                    <td className="border-2 border-black">{book.customerId.name}</td>
-                                    <td className="border-2 border-black">{book.hotelId.name}</td>
-                                    <td className="border-2 border-black">{book.checkIn}</td>
-                                    <td className="border-2 border-black">{book.checkOut}</td>
-                                    <td className="border-2 border-black">{book.numberOfGuest}</td>
-                                    <td className="border-2 border-black">{book.totalPrice}</td>
-                                    <td className="border-2 border-black p-2">
-                                        <button
-                                            onClick={() => {
-                                                fetch(`http://localhost:8084/api/hotel/${book.id}`,{
-                                                    method: "DELETE"
-                                                }).then((response) => {
-                                                    if(response.ok){
-                                                        setDataBooking(dataBooking.filter((b) => b.id !== book.id))
-                                                    }
-                                                })
-                                            }}  
-                                            className="p-2 bg-red-600 text-white rounded font-rowdies">Hapus</button>
-                                    </td>
+                            {dataBooking && dataBooking.length > 0 ?
+                                dataBooking.map((book) => (
+                                    <tr key={book.id} className="font-noto text-center text-xs">
+                                        <td className="border-2 border-black">{book.customerId.firstName} {book.customerId.lastName}</td>
+                                        <td className="border-2 border-black">{book.hotelId.name}</td>
+                                        <td className="border-2 border-black">{book.checkIn}</td>
+                                        <td className="border-2 border-black">{book.checkOut}</td>
+                                        <td className="border-2 border-black">{book.numberOfGuest}</td>
+                                        <td className="border-2 border-black">{book.nights}</td>
+                                        <td className="border-2 border-black">Rp. {book.totalPrice.toLocaleString('id-ID')}</td>
+                                        <td className="border-2 border-black p-2 font-rowdies">
+                                            <button 
+                                                onClick={() => {
+                                                    setPopUpEditBooking(true);
+                                                    setDataPopUpBooking(book);
+                                                }}
+                                                className="bg-blue-600 text-white p-2 rounded mr-2">Edit</button>
+                                            <button
+                                                onClick={() => {
+                                                    fetch(`http://localhost:8084/api/booking/${book.id}`,{
+                                                        method: "DELETE"
+                                                    }).then((response) => {
+                                                        if(response.ok){
+                                                            setDataBooking(dataBooking.filter((b) => b.id !== book.id))
+                                                        }
+                                                    })
+                                                }}  
+                                                className="p-2 bg-red-600 text-white rounded ">Hapus</button>
+                                        </td>
+                                    </tr>
+                                ))
+                                    :
+                                <tr>
+                                    <td colSpan={8} className="font-outfit text-red-600 font-bold text-center w-full p-4">Belum ada pemesanan</td>
                                 </tr>
-                            ))}
-                        </table>
-                    </div>
-                </div>
-            )}
-            {cancel && (
-                <div className="text-black  w-full h-screen flex flex-col p-6">
-                    <div className="font-rowdies text-3xl pt-4">Pembatalan</div>
-                    <div className="flex flex-row justify-between  items-end">
-                        <form action="" className="flex justify-between mt-8">
-                            <div className="flex flex-row items-center">
-                                <input type="text" className="h-8 border-2 border-black p-2 font-rowdies rounded-s-lg text-xs" placeholder="Cari ...."/>
-                                <button className="bg-yellow-400 w-9  h-8 p-1 border-2 border-black rounded-e-lg border-l-0">
-                                    <Search size={20}/>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div className="mt-4">
-                        <table className="w-full border-2 border-black text-xs">
-                            <tr className="bg-blue-600 text-white">
-                                <th className="border-2 border-black">Id</th>
-                                <th className="border-2 border-black">Visitor Name</th>
-                                <th className="border-2 border-black">Hotel</th>
-                                <th className="border-2 border-black">Check In Date</th>
-                                <th className="border-2 border-black">Check Out Date</th>
-                                <th className="border-2 border-black">Guest</th>
-                                <th className="border-2 border-black">Total Price</th>
-                                <th className="border-2 border-black p-2">Action</th>
-                            </tr>
+                            }
                         </table>
                     </div>
                 </div>

@@ -8,6 +8,10 @@ import Admin from './pages/Admin.tsx';
 import LoginHotel from './pages/LoginHotel.tsx';
 import RegisterHotel from './pages/RegisterHotel.tsx';
 import Booking from './pages/Booking.js';
+import Profile from './pages/Profile.tsx';
+import AdminHotel from './pages/AdminHotel.tsx';
+import LoginAdminHotel from './pages/LoginAdminHotel.tsx';
+import RegisterAdminHotel from './pages/RegisterAdminHotel.tsx';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +37,22 @@ const router = createBrowserRouter([
   {
     path: "/booking",
     element: <Booking/>
+  },
+  {
+    path: "/profile",
+    element: <Profile/>
+  },
+  {
+    path: "/admin-hotel",
+    element: <AdminHotel/>
+  },
+  {
+    path: "/login-hotel",
+    element: <LoginAdminHotel/>
+  },
+  {
+    path: "/register-hotel",
+    element: <RegisterAdminHotel/>
   }
 ])
 

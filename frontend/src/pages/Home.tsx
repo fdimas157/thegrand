@@ -20,38 +20,38 @@ export default function Home() {
     numberOfGuest: 0,
     numberOfDays: 0,
   })
-  const [city, setCity] = useState<string>("Jakarta");
+  const [city, setCity] = useState<string>("Sibolga");
   const hotelDipslay = [
     {
       id: 1,
-      city: "Jakarta",
+      city: "Sibolga",
       pic: "/src/assets/hotel/hotel1.png",
-      name: "El Jakarta Hotel",
-      place: "Kelapa Gading, Jakarta",
+      name: "An-Nur Hotel",
+      place: "Pasar Baru, Sibolga",
       priceBefore: "Rp. 300.000",
       priceAfter: "Rp. 234.599"
     },
     {
       id: 2,
-      city: "Bandung",
+      city: "Sidempuan",
       pic: "/src/assets/hotel/hotel2.png",
       name: "Grand Solvakia",
-      place: "Dago, Bandung",
+      place: "Sipirok, Sidempuan",
       priceBefore: "Rp. 649.999",
       priceAfter: "Rp. 524.999"
     },
     {
       id: 3,
-      city: "Surabaya",
+      city: "Barus",
       pic: "/src/assets/hotel/hotel3.png",
       name: "Surya Yudha Hotel",
-      place: "Simokerto, Surabaya",
+      place: "Jl. Imam Bonjol, Barus",
       priceBefore: "Rp. 250.000",
       priceAfter: "Rp. 174.599"
     },
     {
       id: 4,
-      city: "Medan",
+      city: "Pinang Sori",
       pic: "/src/assets/hotel/hotel4.png",
       name: "Grand Kanaya",
       place: "Sibolga, Medan",
@@ -60,19 +60,19 @@ export default function Home() {
     },
     {
       id: 5,
-      city: "Jakarta",
+      city: "Pandan",
       pic: "/src/assets/hotel/hotel1.png",
       name: "OYO Persimpangan",
-      place: "Sarinah, Jakarta Pusat",
+      place: "Batutu, Pandan",
       priceBefore: "Rp. 150.000",
       priceAfter: "Rp. 94.599"
     },
     {
       id: 6,
-      city: "Yogyakarta",
+      city: "Sibolga",
       pic: "/src/assets/hotel/hotel6.png",
-      name: "OYO Jl. Malioboro",
-      place: "Malioboro, Yogyakarta",
+      name: "OYO Jl. Simatupang",
+      place: "Simatupang, Sibolga",
       priceBefore: "Rp. 180.000",
       priceAfter: "Rp. 104.999"
     },
@@ -80,8 +80,6 @@ export default function Home() {
   const navigate = useNavigate();
   const date = new Date();
   date.setDate(date.getDate() + 1);
-  // const tomorrow = date.toISOString().split('T')[0];
-  // const today = new Date().toISOString().split('T')[0];
   const [numberOfDays, setNumberOfDays] = useState(0);
   
   
@@ -100,7 +98,7 @@ export default function Home() {
             Wujudkan perjalanan impianmu, eksplor pilihan hotel terbaik di {city}
           </p>
         </div>
-        <div className="w-3/4 h-28 bg-white rounded-xl flex justify-center items-center absolute bottom-0 shadow-xl">
+        <div className="h-28 bg-white rounded-xl flex justify-center items-center absolute bottom-0 shadow-xl w-3/4">
         <form
             action=""
             className="flex justify-center items-center font-noto text-center"
@@ -108,27 +106,27 @@ export default function Home() {
             <table>
               <tbody>
                 <tr className="font-bold text-sm"> 
-                  <td>Kota</td>
+                  <td >Kota</td>
                   <td>Tanggal Check-In</td>
                   <td>Tanggal Check-Out</td>
-                  <td>Jumlah Tamu</td>
+                  <td className="w-full">Jumlah Tamu</td>
                 </tr>
                 <tr className="font-outfit">
-                  <td className="border border-black w-1/4">
+                  <td className="border border-black w-full">
                     <select 
                       onChange={(e) => {
                         setCity(e.target.value);
                         setSearchHotel({...searchHotel, city: e.target.value});
                         localStorage.setItem("city", e.target.value);
                       }}
-                      className="w-full px-2 focus:outline-none"
+                      className="w-40 h-8 px-2 focus:outline-none"
                     >
                       <option value="">Pilih Kota</option>
-                      <option value="Jakarta">Jakarta</option>
-                      <option value="Surabaya">Surabaya</option>
-                      <option value="Bandung">Bandung</option>
-                      <option value="Yogyakarta">Yogyakarta</option>
-                      <option value="Medan">Medan</option>
+                      <option value="Sibolga">Sibolga</option>
+                      <option value="Pandan">Pandan</option>
+                      <option value="Barus">Barus</option>
+                      <option value="Pinang Sori">Pinang Sori</option>
+                      <option value="Sidempuan">Sidempuan</option>
                     </select>
                   </td>
                   <td className="border border-black w-1/4">
@@ -138,19 +136,38 @@ export default function Home() {
                       value={searchHotel.checkIn}
                       onChange={(e) => {
                         const newCheckIn = e.target.value;
+                        const today = new Date().toISOString().split('T')[0]; // Mendapatkan tanggal hari ini dalam format YYYY-MM-DD
+
+                        // Validasi jika check-in sebelum hari ini
+                        if (newCheckIn < today) {
+                          alert("Tanggal check-in tidak boleh sebelum hari ini.");
+                          return;
+                        }
+
                         setSearchHotel(prev => {
                           const newSearchHotel = { ...prev, checkIn: newCheckIn };
                           if (newSearchHotel.checkOut) {
                             const checkInDate = new Date(newSearchHotel.checkIn);
                             const checkOutDate = new Date(newSearchHotel.checkOut);
-                            const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
-                            const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-                            setNumberOfDays(differenceInDays);
+
+                            // Validasi jika check-out lebih awal atau sama dengan check-in
+                            if (checkOutDate <= checkInDate) {
+                              if (checkOutDate.getTime() === checkInDate.getTime()) {
+                                alert("Tanggal check-in dan check-out tidak boleh sama.");
+                              } else {
+                                alert("Tanggal check-out tidak boleh lebih awal dari tanggal check-in.");
+                              }
+                              newSearchHotel.checkOut = ""; // Reset tanggal check-out jika tidak valid
+                            } else {
+                              const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
+                              const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+                              setNumberOfDays(differenceInDays);
+                            }
                           }
                           return newSearchHotel;
                         });
                       }}
-                      className="w-full h-8 border-none focus:outline-none px-2"
+                      className="w-40 h-8 border-none focus:outline-none px-2"
                     />
                   </td>
                   <td className="border border-black w-1/4">
@@ -165,23 +182,61 @@ export default function Home() {
                           if (newSearchHotel.checkIn) {
                             const checkInDate = new Date(newSearchHotel.checkIn);
                             const checkOutDate = new Date(newSearchHotel.checkOut);
-                            const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
-                            const differenceInDays = differenceInTime / (1000 * 3600 * 24);
-                            setNumberOfDays(differenceInDays);
+
+                            // Validasi jika check-out lebih awal atau sama dengan check-in
+                            if (checkOutDate <= checkInDate) {
+                              if (checkOutDate.getTime() === checkInDate.getTime()) {
+                                alert("Tanggal check-in dan check-out tidak boleh sama.");
+                              } else {
+                                alert("Tanggal check-out tidak boleh lebih awal dari tanggal check-in.");
+                              }
+                              newSearchHotel.checkOut = ""; // Reset tanggal check-out jika tidak valid
+                            } else {
+                              const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
+                              const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+                              setNumberOfDays(differenceInDays);
+                            }
                           }
                           return newSearchHotel;
                         });
                       }}
-                      className="w-full h-8 border-none focus:outline-none px-2"
+                      className="w-40 h-8 border-none focus:outline-none px-2"
                     />
                   </td>
                   <td className="border border-black w-1/4">
                     <input
                       type="number"
                       required
+                      min={1}
+                      max={4} // Set max 4 pada atribut HTML
                       value={searchHotel.numberOfGuest}
-                      onChange={(e) => setSearchHotel({...searchHotel, numberOfGuest: parseInt(e.target.value), numberOfDays: numberOfDays})}
-                      className="w-full h-8 border-none focus:outline-none px-2"
+                      onChange={(e) => {
+                      const value = parseInt(e.target.value) || 1; // Pastikan default 1 jika input kosong atau NaN
+
+                        // Validasi agar nilai antara 1 dan 4
+                        if (value < 1) {
+                          alert("Jumlah tamu minimal adalah 1 orang.");
+                          setSearchHotel({
+                            ...searchHotel,
+                            numberOfGuest: 1, // Set ke 1 jika nilai kurang dari 1
+                            numberOfDays: numberOfDays
+                          });
+                        } else if (value > 4) {
+                          alert("Jumlah tamu maksimal adalah 4 orang.");
+                          setSearchHotel({
+                            ...searchHotel,
+                            numberOfGuest: 4, // Set ke 4 jika nilai lebih dari 4
+                            numberOfDays: numberOfDays
+                          });
+                        } else {
+                          setSearchHotel({
+                            ...searchHotel,
+                            numberOfGuest: value,
+                            numberOfDays: numberOfDays
+                          });
+                        }
+                      }}
+                      className="w-32 h-8 border-none focus:outline-none px-2"
                     />
                   </td>
                   <td className="border border-black bg-orange-600 cursor-pointer">

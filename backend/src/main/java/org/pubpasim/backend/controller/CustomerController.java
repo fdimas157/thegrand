@@ -38,6 +38,11 @@ public class CustomerController {
         return customerRepository.findById(id);
     }
 
+    @GetMapping("last-idx")
+    public Customer getLastIndex() {
+        return customerRepository.findLastUser();
+    }
+
     @GetMapping("byemail/{email}")
     public Optional<Customer> getCustomerByEmail(@PathVariable String email){
         return customerRepository.findByEmail(email);
